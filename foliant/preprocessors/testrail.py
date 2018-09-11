@@ -4,26 +4,26 @@ Collects test cases from TestRail project to markdown file.
 '''
 
 
-import re
-from pathlib import Path
-from yaml import load
-
-from .testrailapi import *
-from .case_processing import case_process
-
 from foliant.preprocessors.base import BasePreprocessor
+from .testrailapi import *
+
+from jinja2 import Environment, FileSystemLoader
+from pkg_resources import resource_filename
+import os
+from pathlib import Path
+from pprint import pprint
+from shutil import copytree
+import re
+from yaml import load
 
 
 class Preprocessor(BasePreprocessor):
     defaults = {
         'filename': 'test_cases.md',
+        'template_folder': 'case_templates',
         'platform_id': 0,
         'platforms': 'smarttv, androidtv, appletv, web',
         'section_header': 'Программа испытаний',
-        'case_preconds_header': '**Предусловие:**',
-        'case_scenario_header': '**Сценарий:**',
-        'case_scenario_step_header': '*Шаг*',
-        'case_result_header': '*Ожидаемый результат:*',
         'std_table_header': 'Таблица прохождения испытаний',
         'std_table_column_headers': '№; ID; Название; Успешно; Комментарий',
         'suite_ids': set(),
@@ -35,6 +35,7 @@ class Preprocessor(BasePreprocessor):
         'resolve_urls': False,
         'screenshots_url': '',
         'screenshots_ext': '.png',
+        'print_case_structure': False,
     }
 
 
@@ -46,12 +47,9 @@ class Preprocessor(BasePreprocessor):
         self.logger.debug(f'Preprocessor inited: {self.__dict__}')
 
         self._filename = self.options['filename']
+        self._template_folder = self.options['template_folder']
         self._section_header = self.options['section_header']
-        self._case_preconds_header = self.options['case_preconds_header']
-        self._case_scenario_header = self.options['case_scenario_header']
-        self._case_scenario_step_header = self.options['case_scenario_step_header']
 
-        self._case_result_header = self.options['case_result_header']
         self._std_table_header = self.options['std_table_header']
         self._std_table_column_headers = self.options['std_table_column_headers'].replace(' ', '').split(';')
 
@@ -84,10 +82,17 @@ class Preprocessor(BasePreprocessor):
         self._screenshots_url = self.options['screenshots_url']
         self._screenshots_ext = self.options['screenshots_ext']
 
+        self._print_case_structure = self.options['print_case_structure']
+
         self._case_counter = 0
         self._test_cases = ['# ' + self._section_header + '\n\n']
         self._std_table = []
 
+        self._env = Environment(loader=FileSystemLoader(str(self.project_path)))
+
+        self._template_folder = self.options['template_folder']
+        if self._template_folder == self.defaults['template_folder'] and not os.path.exists(self.project_path / self.defaults['template_folder']):
+            copytree(resource_filename(__name__, 'case_templates'), self.project_path / self.defaults['template_folder'])
 
     def _parse_ids_options(self, variable, option):
         if option:
@@ -122,7 +127,7 @@ class Preprocessor(BasePreprocessor):
                             next_iteration = True
 
 
-    def _collect_suites(self, project_suites):
+    def _collect_cases(self, project_suites):
         for suite in project_suites:
 
             if suite['id'] in self._suite_ids:
@@ -131,7 +136,7 @@ class Preprocessor(BasePreprocessor):
                     self._test_cases.append('## %s\n\n' % suite['name'])
                     suite['name'] = ''.join(('**', suite['name'].upper(), '**'))
 
-                    if add_case_id_to_case_name:
+                    if self._add_case_id_to_case_name:
                         self._std_table.append((' | '.join(('', ' ', ' ', suite['name'], ' ', ' ', ' '))).strip())
                     else:
                         self._std_table.append((' | '.join(('', ' ', suite['name'], ' ', ' ', ' '))).strip())
@@ -174,10 +179,10 @@ class Preprocessor(BasePreprocessor):
                 if section['description']:
                     self._test_cases.append('%s\n\n' % section['description'])
 
-                self._collect_cases(suite_id, section['id'], title_level_up)
+                self._collect_case_data(suite_id, section['id'], title_level_up)
 
 
-    def _collect_cases(self, suite_id, section_id, title_level_up):
+    def _collect_case_data(self, suite_id, section_id, title_level_up):
         section_cases = self._client.send_get(
             'get_cases/%s&suite_id=%s&section_id=%s' %
             (self._project_id, suite_id, section_id))
@@ -205,8 +210,26 @@ class Preprocessor(BasePreprocessor):
                     self._test_cases.append('###%s %s\n\n' % (title_level_up, case['title']))
 
 # Test-case processing differs depending on the template id. All processors are in case_processing module.
-                case_process(self._test_cases, case, self._case_preconds_header, self._case_scenario_header, self._case_scenario_step_header, self._case_result_header, self._screenshots_url, self._platform_name)
-        
+                case_template = '/'.join((str(self.project_path), self._template_folder, ''.join((str(case['template_id']), '.j2'))))
+
+                if not os.path.isfile(case_template):
+                    print(f"\n\nThere is no template for template_id {case['template_id']} (case_id {case['id']}) in folder {self._template_folder}")
+                else:
+                    try:
+                        template = self._env.get_template(case_template)
+                        result = template.render(case=case, platform_name=self._platform_name).split('\r\n')
+                    except Exception:
+                        print(f"\n\nThere is problem with template for template_id {case['template_id']} (case_id {case['id']}) in folder {self._template_folder}")
+                        if self._print_case_structure:
+                            print('\nCase structure:')
+                            pprint(case)
+                        result = None
+
+                    if result:
+                        for string in result:
+                            self._test_cases.append(string)
+                            self._test_cases.append('\n')
+
 
     def _remove_empty_chapters(self):
         next_iteration = True
@@ -222,7 +245,7 @@ class Preprocessor(BasePreprocessor):
 
                 string_counter += 1
 
-                if self._test_cases[index].startswith(self._case_scenario_header):
+                if self._test_cases[index] and not self._test_cases[index].startswith('#'):
                     empty_chapter = False
 
                 elif self._test_cases[index].startswith('#'):
@@ -315,7 +338,7 @@ class Preprocessor(BasePreprocessor):
 
         self._collect_suites_and_sections_ids(project_suites)
 
-        self._collect_suites(project_suites)
+        self._collect_cases(project_suites)
 
         self._remove_empty_chapters()
 
