@@ -173,7 +173,7 @@ images/
 Now to add screenshot to your document just add following string to the test case (unfortunately, in TestRail interface it will looks like broken image link):
 
 ```
-    ![Image title](main_filename_part)
+(leading exclamation mark here!)[Image title](main_filename_part)
 ```
 
 Preprocessor will convert to the following format:
@@ -185,13 +185,13 @@ https://gitlab.url/gitlab_group_name/gitlab_project_name/raw/master/images/platf
 For example, in project for *smarttv* platform the string
 
 ```
-    ![Application main screen](main_screen)
+(leading exclamation mark here!)[Application main screen](main_screen)
 ```
 
 will be converted to:
 
 ```
-    ![Application main screen](https://gitlab.url/documentation/application-screenshots/raw/master/images/smarttv/main_screen_smarttv.png)
+(leading exclamation mark here!)[Application main screen](https://gitlab.url/documentation/application-screenshots/raw/master/images/smarttv/main_screen_smarttv.png)
 ```
 
 That's it.
