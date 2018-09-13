@@ -14,7 +14,7 @@ from pathlib import Path
 from pprint import pprint
 from shutil import copytree
 import re
-from yaml import load
+# from yaml import load
 
 
 class Preprocessor(BasePreprocessor):
@@ -71,7 +71,10 @@ class Preprocessor(BasePreprocessor):
 
         self._platform_id = self.options['platform_id']
         self._platforms = self.options['platforms'].replace(' ', '').split(',')
-        self._platform_name = self._platforms[self._platform_id-1]
+        if not self._platform_id == self.defaults['platform_id']:
+            self._platform_name = self._platforms[self._platform_id-1]
+        else:
+            self._platform_name = ''
 
         self._add_cases_without_platform = self.options['add_cases_without_platform']
         self._add_unpublished_cases = self.options['add_unpublished_cases']
@@ -79,7 +82,10 @@ class Preprocessor(BasePreprocessor):
         self._add_std_table = self.options['add_std_table']
 
         self._resolve_urls = self.options['resolve_urls']
-        self._screenshots_url = self.options['screenshots_url']
+        if not self._platform_id == self.defaults['platform_id']:
+            self._screenshots_url = '/'.join((self.options['screenshots_url'], 'raw/master/images', self._platform_name, ''))
+        else:
+            self._screenshots_url = '/'.join((self.options['screenshots_url'], 'raw/master/images/'))
         self._screenshots_ext = self.options['screenshots_ext']
 
         self._print_case_structure = self.options['print_case_structure']
@@ -213,13 +219,13 @@ class Preprocessor(BasePreprocessor):
                 case_template = '/'.join((str(self.project_path), self._template_folder, ''.join((str(case['template_id']), '.j2'))))
 
                 if not os.path.isfile(case_template):
-                    print(f"\n\nThere is no template for template_id {case['template_id']} (case_id {case['id']}) in folder {self._template_folder}")
+                    print(f"\n\nhere is no jinja template for test case template_id {case['template_id']} (case_id {case['id']}) in folder {self._template_folder}")
                 else:
                     try:
                         template = self._env.get_template(case_template)
                         result = template.render(case=case, platform_name=self._platform_name).split('\r\n')
                     except Exception:
-                        print(f"\n\nThere is problem with template for template_id {case['template_id']} (case_id {case['id']}) in folder {self._template_folder}")
+                        print(f"\n\nThere is problem with jinja template for test case template_id {case['template_id']} (case_id {case['id']}) in folder {self._template_folder}")
                         if self._print_case_structure:
                             print('\nCase structure:')
                             pprint(case)
@@ -324,7 +330,10 @@ class Preprocessor(BasePreprocessor):
     def _resolve_url(self):
         for i, string in enumerate(self._test_cases):
             if '![' in string:
-                self._test_cases[i] = re.sub("(?<=[\]][\(])(\w*)", self._screenshots_url + "\g<1>" + '_' + self._platform_name + self._screenshots_ext, string)
+                if not self._platform_id == self.defaults['platform_id']:
+                    self._test_cases[i] = re.sub("(?<=[\]][\(])(\w*)", self._screenshots_url + "\g<1>" + '_' + self._platform_name + self._screenshots_ext, string)
+                else:
+                    self._test_cases[i] = re.sub("(?<=[\]][\(])(\w*)", self._screenshots_url + "\g<1>" + self._screenshots_ext, string)
 
 
     def apply(self):
