@@ -112,8 +112,16 @@ class Preprocessor(BasePreprocessor):
     def _collect_suites_and_sections_ids(self, project_suites):
 
         if not self._suite_ids:
-            for suite in project_suites:
-                self._suite_ids.add(suite['id'])
+            if not self._section_ids:
+                for suite in project_suites:
+                    self._suite_ids.add(suite['id'])
+            else:
+                for suite in project_suites:
+                    suite_sections = self._client.send_get('get_sections/%s&suite_id=%s' % (self._project_id, suite['id']))
+                    for section in suite_sections:
+                        if section['id'] in self._section_ids:
+                            self._suite_ids.add(suite['id'])
+                            continue
         if not self._section_ids:
             for suite in project_suites:
                 if suite['id'] in self._suite_ids:
