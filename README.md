@@ -26,7 +26,7 @@ preprocessors:
     platforms: smarttv, androidtv, appletv, web                         \\ Optional
     platform_id: 0                                                      \\ Optional
     filename: test_cases.md                                             \\ Optional
-    rewrite_src_file: true                                              \\ Optional
+    rewrite_src_file: false                                             \\ Optional
     template_folder: case_templates                                     \\ Optional
     section_header: Testing program                                     \\ Recommended
     std_table_header: Table with testing results                        \\ Recommended
