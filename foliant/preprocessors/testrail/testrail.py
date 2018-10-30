@@ -12,14 +12,14 @@ from pkg_resources import resource_filename
 import os
 from pathlib import Path
 from pprint import pprint
-from shutil import copytree
+from shutil import copytree, copyfile
 import re
-# from yaml import load
 
 
 class Preprocessor(BasePreprocessor):
     defaults = {
         'filename': 'test_cases.md',
+        'rewrite_src_file': False,
         'template_folder': 'case_templates',
         'platform_id': 0,
         'platforms': 'smarttv, androidtv, appletv, web',
@@ -47,6 +47,7 @@ class Preprocessor(BasePreprocessor):
         self.logger.debug(f'Preprocessor inited: {self.__dict__}')
 
         self._filename = self.options['filename']
+        self._rewrite_src_file = self.options['rewrite_src_file']
         self._template_folder = self.options['template_folder']
         self._section_header = self.options['section_header']
 
@@ -376,5 +377,9 @@ class Preprocessor(BasePreprocessor):
         with open(markdown_file_path, 'w', encoding="utf-8") as file_to_write:
             for string in self._test_cases:
                 file_to_write.write(string)
+
+        src_file_path = '/'.join((str(self.config['src_dir']), self._filename))
+        if self._rewrite_src_file:
+            copyfile(markdown_file_path, src_file_path)
 
         self.logger.info('Preprocessor applied')

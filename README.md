@@ -26,6 +26,7 @@ preprocessors:
     platforms: smarttv, androidtv, appletv, web                         \\ Optional
     platform_id: 0                                                      \\ Optional
     filename: test_cases.md                                             \\ Optional
+    rewrite_src_file: true                                              \\ Optional
     template_folder: case_templates                                     \\ Optional
     section_header: Testing program                                     \\ Recommended
     std_table_header: Table with testing results                        \\ Recommended
@@ -71,7 +72,7 @@ You can add a custom field to your test case template in TestRail to use the sam
 That's all about platforms.
 
 `filename`
-:   Path to the test case file. It must be created (can be empty) and placed in the project folder in advance. Also it should be added to project chapters in *foliant.yml*. Default: *test_cases.md*. For example:
+:   Path to the test cases file. It should be added to project chapters in *foliant.yml*. Default: *test_cases.md*. For example:
 
 ```yaml
 title: &title Test procedure
@@ -90,6 +91,9 @@ preprocessors:
     project_id: 35
     filename: awesome_test_cases.md
 ```
+
+`rewrite_src_file`
+:   You can update test cases file after each use of preprocessor. Be careful, previous data will be deleted.
 
 `template_folder`
 :   Preprocessor uses Jinja2 templates to compose the file with test cases. Here you can find documentation: http://jinja.pocoo.org/docs/2.10/ . You can store templates in folder inside the foliant project, but if it's not default *case_templates* you have to write it here.
