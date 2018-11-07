@@ -147,9 +147,7 @@ class Preprocessor(BasePreprocessor):
 
             if suite['id'] in self._suite_ids:
 
-                suite_name = self._client.send_get('get_suite/%s' % suite['id'])['name']
-
-                if len(self._suite_ids) > 1 or (len(self._suite_ids) == 1 and suite_name != 'Master'):  # Add suite names if present and raise next chapters title level
+                if len(self._suite_ids) > 1 or (len(self._suite_ids) == 1 and suite['name'] != 'Master'):  # Add suite names if present and raise next chapters title level
                     self._test_cases.append('## %s\n\n' % suite['name'])
                     suite['name'] = ''.join(('**', suite['name'].upper(), '**'))
 
