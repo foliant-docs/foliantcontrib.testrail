@@ -1,3 +1,7 @@
+# 1.0.7
+
+-   Minor fixes.
+
 # 1.0.6
 
 -   Added: parameters to exclude suite and section headers from the final document.
