@@ -28,6 +28,8 @@ class Preprocessor(BasePreprocessor):
         'std_table_column_headers': '№; ID; Название; Успешно; Комментарий',
         'suite_ids': set(),
         'section_ids': set(),
+        'add_suite_headers': True,
+        'add_section_headers': True,
         'add_cases_without_platform': True,
         'add_unpublished_cases': True,
         'add_case_id_to_case_name': False,
@@ -77,6 +79,8 @@ class Preprocessor(BasePreprocessor):
         else:
             self._platform_name = ''
 
+        self._add_suite_headers = self.options['add_suite_headers']
+        self._add_section_headers = self.options['add_section_headers']
         self._add_cases_without_platform = self.options['add_cases_without_platform']
         self._add_unpublished_cases = self.options['add_unpublished_cases']
         self._add_case_id_to_case_name = self.options['add_case_id_to_case_name']
@@ -147,7 +151,7 @@ class Preprocessor(BasePreprocessor):
 
             if suite['id'] in self._suite_ids:
 
-                if len(self._suite_ids) > 1 or (len(self._suite_ids) == 1 and suite['name'] != 'Master'):  # Add suite names if present and raise next chapters title level
+                if self._add_suite_headers and (len(self._suite_ids) > 1 or suite['name'] != 'Master'):  # Add suite names if present and raise next chapters title level
                     self._test_cases.append('## %s\n\n' % suite['name'])
                     suite['name'] = ''.join(('**', suite['name'].upper(), '**'))
 
@@ -158,41 +162,46 @@ class Preprocessor(BasePreprocessor):
 
                     if suite['description']:
                         self._test_cases.append('%s\n\n' % suite['description'])
-                    shift_title_level = 1
+                    suite_title_level_up = '#'
                 else:
-                    shift_title_level = 0
+                    suite_title_level_up = ''
 
-                self._collect_sections(suite['id'], shift_title_level)
+                self._collect_sections(suite['id'], suite_title_level_up)
 
 
-    def _collect_sections(self, suite_id, shift_title_level):
+    def _collect_sections(self, suite_id, suite_title_level_up):
         suite_sections = self._client.send_get('get_sections/%s&suite_id=%s' % (self._project_id, suite_id))
 
         for section in suite_sections:
 
-            title_level_up = ''
-            for i in range(section['depth'] + shift_title_level):
-                title_level_up += '#'
+            title_level_up = suite_title_level_up
 
-            section_name = re.sub("[0-9].*\.", "", section['name']).strip()  # Remove numbers in section headers
+            if self._add_section_headers:
+                for i in range(section['depth']):
+                    title_level_up += '#'
 
-            if section_name.isupper():  # Remove headers capitalization
-                section_name = section_name.lower()
-                section_name = section_name[0].upper() + section_name[1:]
+                section_name = re.sub("[0-9].*\.", "", section['name']).strip()  # Remove numbers in section headers
 
-            self._test_cases.append('##%s %s\n\n' % (title_level_up,
-                            section_name))
+                if section_name.isupper():  # Remove headers capitalization
+                    section_name = section_name.lower()
+                    section_name = section_name[0].upper() + section_name[1:]
 
-            section_name = ''.join(('**', section_name, '**'))
-            if self._add_case_id_to_case_name:
-                self._std_table.append((' | '.join(('', ' ', ' ', section_name, ' ', ' ', ' '))).strip())
-            else:
-                self._std_table.append((' | '.join(('', ' ', section_name, ' ', ' ', ' '))).strip())
+                self._test_cases.append('##%s %s\n\n' % (title_level_up,
+                                section_name))
+
+                section_name = ''.join(('**', section_name, '**'))
+                if self._add_case_id_to_case_name:
+                    self._std_table.append((' | '.join(('', ' ', ' ', section_name, ' ', ' ', ' '))).strip())
+                else:
+                    self._std_table.append((' | '.join(('', ' ', section_name, ' ', ' ', ' '))).strip())
 
             if section['id'] in self._section_ids:  # This condition is checked not earlier to save parent chapter headers
 
-                if section['description']:
+                if self._add_section_headers and section['description']:
                     self._test_cases.append('%s\n\n' % section['description'])
+
+                if self._add_section_headers:
+                    title_level_up += '#'
 
                 self._collect_case_data(suite_id, section['id'], title_level_up)
 
@@ -219,10 +228,10 @@ class Preprocessor(BasePreprocessor):
 
                 if self._add_case_id_to_case_name:
                     self._std_table.append((' | '.join(('', str(self._case_counter), str(case['id']), case['title'], ' ', ' ', ' '))).strip())
-                    self._test_cases.append('###%s %s (C%s)\n\n' % (title_level_up, case['title'], case['id']))
+                    self._test_cases.append('##%s %s (C%s)\n\n' % (title_level_up, case['title'], case['id']))
                 else:
                     self._std_table.append((' | '.join(('', str(self._case_counter), case['title'], ' ', ' ', ' '))).strip())
-                    self._test_cases.append('###%s %s\n\n' % (title_level_up, case['title']))
+                    self._test_cases.append('##%s %s\n\n' % (title_level_up, case['title']))
 
 # Test-case processing differs depending on the template id. All processors are in case_processing module.
                 case_template = '/'.join((str(self.project_path), self._template_folder, ''.join((str(case['template_id']), '.j2'))))

@@ -31,6 +31,8 @@ preprocessors:
     section_header: Testing program                                     \\ Recommended
     std_table_header: Table with testing results                        \\ Recommended
     std_table_column_headers: №; ID; Test case name; Result; Comment    \\ Recommended
+    add_suite_headers: true                                             \\ Optional
+    add_section_headers: true                                           \\ Optional
     add_cases_without_platform: true                                    \\ Optional
     add_unpublished_cases: false                                        \\ Optional
     add_case_id_to_case_name: false                                     \\ Optional
@@ -134,6 +136,12 @@ Next three fields are necessary due localization issues. While markdown document
 
 `std_table_column_headers`
 :   Semicolon separated headers of testing table columns. By default it's *№; ID; Test case name; Result; Comment* in Russian.
+
+`add_suite_headers`
+:   With *false* you can exclude all suite headers from the final document.
+
+`add_section_headers`
+:   With *false* you can exclude all section headers from the final document.
 
 `add_cases_without_platform`
 :   If you set several platforms as previously described, you still can ignore this setting and download all project test cases regardless of its platforms.
