@@ -160,10 +160,10 @@ Next three fields are necessary due localization issues. While markdown document
 `add_case_id_to_std_table`
 :   Also you can add (*true*) the column with the test case IDs to the testing table.
 
-In TestRail you can add custom parameters to your test case template. With next settings you can use one *multi-select* (good for platforms, for example) and one *checkbox* (publishing) plus default *priority* parameter for cases sampling.
+In TestRail you can add custom parameters to your test case template. With next settings you can use one *multi-select* or *dropdown* (good for platforms, for example) and one *checkbox* (publishing) plus default *priority* parameter for cases sampling.
 
 `multi_param_name`
-:   Parameter name of *multi-select* type you set in *System Name* field of *Add Custom Field* form in TestRail. For example, *platforms* with values *Android*, *iOS*, *PC*, *Mac* and *web*.
+:   Parameter name of *multi-select* or *dropdown* type you set in *System Name* field of *Add Custom Field* form in TestRail. For example, *platforms* with values *Android*, *iOS*, *PC*, *Mac* and *web*. If *multi_param_select* not set, all test cases will be downloaded (useful when you need just to add parameter value th the test headers or testing table).
 
 `multi_param_select`
 :   Here you can set the platforms for which you want to get test cases (case insensitive). For example, you have similar UX for mobile platforms and want to combine them:
@@ -200,13 +200,13 @@ With *multi_param_select: android, ios* we will get the following cases:
 | Test case 9 |         |  +  |    |     |     |   |  +  |     |  +   |       |
 
 `add_cases_without_multi_param`
-:   Also you can include (by default) or exclude (*false*) cases without any value of multi-select parameter.
+:   Also you can include (by default) or exclude (*false*) cases without any value of *multi-select* or *dropdown* parameter.
 
 `add_multi_param_to_case_header`
-:   You can add (*true*) values of multi-select parameter to the case headers or not (by default).
+:   You can add (*true*) values of *multi-select* or *dropdown* parameter to the case headers or not (by default).
 
 `add_multi_param_to_std_table`
-:   You can add (*true*) column with values of multi-select parameter to the testing table or not (by default).
+:   You can add (*true*) column with values of *multi-select* or *dropdown* parameter to the testing table or not (by default).
 
 `checkbox_param_name`
 :   Parameter name of *checkbox* type you set in *System Name* field of *Add Custom Field* form in TestRail. For example, *publish*. Without parameter name set all of cases will be downloaded.

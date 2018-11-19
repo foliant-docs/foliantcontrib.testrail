@@ -255,6 +255,11 @@ class Preprocessor(BasePreprocessor):
         priority_cond = True
         exclude_cond = True
 
+        if type(case[self._params['multi_param_sys_name']]) == int:
+            int_to_list = []
+            int_to_list.append(case[self._params['multi_param_sys_name']])
+            case[self._params['multi_param_sys_name']] = int_to_list
+
         if self._params['multi_param_sys_name'] in case.keys():
             if self._params['multi_param_sys_name'] not in case.keys() and not self._params['add_cases_without_multi_param']:
                     multi_param_cond = False
@@ -456,7 +461,7 @@ class Preprocessor(BasePreprocessor):
                     if self._project_id in item['context']['project_ids']:
                         values = item['options']['items'].split('\n')
         for value in values:
-            if value.split(',')[1].strip().lower() in self._params['multi_param_select']:
+            if value.split(',')[1].strip().lower() in self._params['multi_param_select'] or self._params['multi_param_select'] == ['']:
                 multi_param_matches.add(int(value.split(',')[0].strip()))
             self._params['multi_param_values'].update({int(value.split(',')[0].strip()): value.split(',')[1].strip()})
 

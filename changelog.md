@@ -1,3 +1,7 @@
+# 1.1.2
+
+-   Now it's possible to use *dropdown* type parameters for test cases samplings.
+
 # 1.1.1
 
 -   Readme updated.
