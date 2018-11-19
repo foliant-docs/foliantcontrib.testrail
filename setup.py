@@ -16,7 +16,7 @@ setup(
     description=SHORT_DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     long_description_content_type='text/markdown',
-    version='1.0.7',
+    version='1.1.0',
     author='Anton Bukhtiyarov',
     author_email='apkraft@gmail.com',
     url='https://github.com/foliant-docs/foliantcontrib.testrail',
@@ -25,7 +25,7 @@ setup(
     license='MIT',
     platforms='any',
     install_requires=[
-        'foliant>=1.0.5',
+        'foliant>=1.0.8',
         'Jinja2'
     ],
     classifiers=[
