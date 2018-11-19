@@ -1,3 +1,7 @@
+# 1.1.1
+
+-   Readme updated.
+
 # 1.1.0
 
 -   Removed parameters:
