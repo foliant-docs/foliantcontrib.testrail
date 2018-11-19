@@ -188,7 +188,7 @@ preprocessors:
 With *multi_param_select: android, ios* we will get the following cases:
 
 | Test cases  | Android | iOS | PC | Mac | web |   | any | all | only | match |
-|-------------|---------|-----|----|-----|-----|---|-----|-----|------|-------|
+|-------------|:-------:|:---:|:--:|:---:|:---:|---|:---:|:---:|:----:|:-----:|
 | Test case 1 |    +    |  +  |    |     |     |   |  +  |  +  |  +   |   +   |
 | Test case 2 |    +    |  +  |    |     |     |   |  +  |  +  |  +   |   +   |
 | Test case 3 |         |     | +  | +   |     |   |     |     |      |       |
