@@ -307,7 +307,7 @@ class Preprocessor(BasePreprocessor):
                 if self._params['add_priority_to_case_header']:
                     header_ending_list.append(self._priorities[case['priority_id']])
                 text = ''
-                if self._params['multi_param_name']:
+                if self._params['multi_param_name'] and self._params['multi_param_sys_name'] in case.keys():
                     for item in case[self._params['multi_param_sys_name']]:
                         text += self._params['multi_param_values'][item] + ', '
                 if self._params['add_multi_param_to_std_table']:

@@ -1,3 +1,7 @@
+# 1.1.4
+
+-   Another bug with multi-select parameter processing fixed.
+
 # 1.1.3
 
 -   Jinja templates updated.
