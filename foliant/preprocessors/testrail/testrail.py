@@ -255,10 +255,10 @@ class Preprocessor(BasePreprocessor):
         priority_cond = True
         exclude_cond = True
 
-        if type(case[self._params['multi_param_sys_name']]) == int:
-            case[self._params['multi_param_sys_name']] = [case[self._params['multi_param_sys_name']]]
-
         if self._params['multi_param_sys_name'] in case.keys():
+            if type(case[self._params['multi_param_sys_name']]) == int:
+                case[self._params['multi_param_sys_name']] = [case[self._params['multi_param_sys_name']]]
+
             if self._params['multi_param_sys_name'] not in case.keys() and not self._params['add_cases_without_multi_param']:
                     multi_param_cond = False
             elif self._params['multi_param_select_type'] == 'any' and not (set(case[self._params['multi_param_sys_name']]) & self._params['multi_param_matches']):
