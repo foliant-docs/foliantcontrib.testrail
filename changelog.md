@@ -1,3 +1,7 @@
+# 1.1.3 (under development)
+
+-   Jinja templates updated.
+
 # 1.1.2
 
 -   Now it's possible to use *dropdown* type parameters for test cases samplings.

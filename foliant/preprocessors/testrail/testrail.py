@@ -256,9 +256,7 @@ class Preprocessor(BasePreprocessor):
         exclude_cond = True
 
         if type(case[self._params['multi_param_sys_name']]) == int:
-            int_to_list = []
-            int_to_list.append(case[self._params['multi_param_sys_name']])
-            case[self._params['multi_param_sys_name']] = int_to_list
+            case[self._params['multi_param_sys_name']] = [case[self._params['multi_param_sys_name']]]
 
         if self._params['multi_param_sys_name'] in case.keys():
             if self._params['multi_param_sys_name'] not in case.keys() and not self._params['add_cases_without_multi_param']:

@@ -1,4 +1,5 @@
 
+{% if case['custom_steps'] %}
 {% if case['custom_preconds'] %}
 **Предусловие:**
 
@@ -13,4 +14,5 @@
 *Ожидаемый результат:*
 
 {{ case['custom_expected'] }}
+{% endif %}
 {% endif %}

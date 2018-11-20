@@ -1,4 +1,5 @@
 
+{% if case['custom_steps_separated'][0]['content'] %}
 {% if case['custom_preconds'] %}
 **Предусловие:**
 
@@ -16,3 +17,4 @@
 {{ case_step['expected'] }}
 
 {% endfor %}
+{% endif %}
