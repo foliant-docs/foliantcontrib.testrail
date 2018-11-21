@@ -1,3 +1,7 @@
+# 1.1.5 (under development)
+
+-   Readme updated.
+
 # 1.1.4
 
 -   Another bug with multi-select parameter processing fixed.

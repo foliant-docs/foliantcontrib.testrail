@@ -108,12 +108,13 @@ preprocessors:
 `template_folder`
 :   Preprocessor uses Jinja2 templates to compose the file with test cases. Here you can find documentation: http://jinja.pocoo.org/docs/2.10/ . You can store templates in folder inside the foliant project, but if it's not default *case_templates* you have to write it here.
 
-If this value not set and there is no default *case_templates* folder in the project, it will be created automatically with two jinja files for TestRail templates by default — *Test Case (Text)* with *template_id=1* and *Test Case (Steps)* with *template_id=2*.
+If this parameter not set and there is no default *case_templates* folder in the project, it will be created automatically with two jinja files for TestRail templates by default — *Test Case (Text)* with *template_id=1* and *Test Case (Steps)* with *template_id=2*.
 
 You can create TestRail templates by yourself in *Administration* panel, *Customizations* section, *Templates* part. Then you have to create jinja templates whith the names *{template_id}.j2* for them. For example, file *2.j2* for *Test Case (Steps)* TestRail template:
 
 ```
 
+{% if case['custom_steps_separated'][0]['content'] %}
 {% if case['custom_preconds'] %}
 **Preconditions:**
 
@@ -131,7 +132,72 @@ You can create TestRail templates by yourself in *Administration* panel, *Custom
 {{ case_step['expected'] }}
 
 {% endfor %}
+{% endif %}
 
+```
+
+You can use all parameters of two variables in the template — *case* and *params*. Case parameters depends on TestRail template. All custom parameters have prefix 'custom_' before system name set in TestRail.
+
+Here is an example of *case* variable (parameters depends on case template):
+
+```
+case = {
+    'created_by': 3,
+    'created_on': 1524909903,
+    'custom_expected': None,
+    'custom_goals': None,
+    'custom_mission': None,
+    'custom_preconds': '- The user is not registered in the system.\r\n'
+        '- Registration form opened.',
+    'custom_steps': '',
+    'custom_steps_separated': [{
+        'content': 'Enter mobile phone number.',
+        'expected': '- Entered phone number '
+        'is visible in the form field.'
+        },
+        {'content': 'Press OK button.',
+        'expected': '- SMS with registration code '
+        'received.\n'}],
+    'custom_test_androidtv': None,
+    'custom_test_appletv': None,
+    'custom_test_smarttv': 'None,
+    'custom_tp': True,
+    'estimate': None,
+    'estimate_forecast': None,
+    'id': 15940,
+    'milestone_id': None,
+    'priority_id': 4,
+    'refs': None,
+    'section_id': 3441,
+    'suite_id': 101,
+    'template_id': 7,
+    'title': 'Registration by mobile phone number.',
+    'type_id': 7,
+    'updated_by': 10,
+    'updated_on': 1528978979
+}
+```
+
+And here is an example of *params* variable (parameters are always the same):
+
+```
+params = {
+    'multi_param_name': 'platform',
+    'multi_param_sys_name': 'custom_platform',
+    'multi_param_select': ['android', 'ios'],
+    'multi_param_select_type': any,
+    'add_cases_without_multi_param': False,
+    'checkbox_param_name': 'publish',
+    'checkbox_param_sys_name': 'custom_publish',
+    'checkbox_param_select_type': 'checked,
+    'choose_priorities': ['critical', 'high', 'medium'],
+    'add_multi_param_to_case_header': True,
+    'add_multi_param_to_std_table': True,
+    'add_priority_to_case_header': True,
+    'add_priority_to_std_table': True,
+    'add_case_id_to_case_header': False,
+    'add_case_id_to_std_table': False
+}
 ```
 
 Next three fields are necessary due localization issues. While markdown document with test cases is composed on the go, you have to set up some document headers. Definitely not the best solution in my life. 
@@ -163,7 +229,7 @@ Next three fields are necessary due localization issues. While markdown document
 In TestRail you can add custom parameters to your test case template. With next settings you can use one *multi-select* or *dropdown* (good for platforms, for example) and one *checkbox* (publishing) plus default *priority* parameter for cases sampling.
 
 `multi_param_name`
-:   Parameter name of *multi-select* or *dropdown* type you set in *System Name* field of *Add Custom Field* form in TestRail. For example, *platforms* with values *Android*, *iOS*, *PC*, *Mac* and *web*. If *multi_param_select* not set, all test cases will be downloaded (useful when you need just to add parameter value th the test headers or testing table).
+:   Parameter name of *multi-select* or *dropdown* type you set in *System Name* field of *Add Custom Field* form in TestRail. For example, *platforms* with values *Android*, *iOS*, *PC*, *Mac* and *web*. If *multi_param_select* not set, all test cases will be downloaded (useful when you need just to add parameter value to the test headers or testing table).
 
 `multi_param_select`
 :   Here you can set the platforms for which you want to get test cases (case insensitive). For example, you have similar UX for mobile platforms and want to combine them:
