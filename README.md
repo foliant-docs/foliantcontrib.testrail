@@ -189,7 +189,7 @@ params = {
     'add_cases_without_multi_param': False,
     'checkbox_param_name': 'publish',
     'checkbox_param_sys_name': 'custom_publish',
-    'checkbox_param_select_type': 'checked,
+    'checkbox_param_select_type': 'checked',
     'choose_priorities': ['critical', 'high', 'medium'],
     'add_multi_param_to_case_header': True,
     'add_multi_param_to_std_table': True,
@@ -331,7 +331,7 @@ images/
 
 *images* folder used for projects without platforms.
 
-Now to add screenshot to your document just add following string to the test case (unfortunately, in TestRail interface it will looks like broken image link):
+Filename ending is a first value of *multi_param_select* parameter (*platform*). Now to add screenshot to your document just add following string to the test case (unfortunately, in TestRail interface it will looks like broken image link):
 
 ```
 (leading exclamation mark here!)[Image title](main_filename_part)
@@ -343,7 +343,7 @@ Preprocessor will convert to the following format:
 https://gitlab.url/gitlab_group_name/gitlab_project_name/raw/master/images/platform_name/main_filename_part_platform_name.png
 ```
 
-For example, in project for *smarttv* platform the string
+For example, in the project with *multi_param_select: smarttv* the string
 
 ```
 (leading exclamation mark here!)[Application main screen](main_screen)
@@ -369,7 +369,7 @@ That's it.
 And the last one emergency tool. If you have no jinja template for any type of TestRail case, you'll see this message like this: *There is no jinja template for test case template_id 5 (case_id 1325) in folder case_templates*. So you have to write jinja template by yourself. To do this it's necessary to know case structure. This parameter shows it to you.
 
 `print_case_structure`
-:   Turn on (true) or off (false, by default) printing out of case structure with all data in it.
+:   Turn on (*true*) or off (*false*, by default) printing out of case structure with all data in it.
 
 
 ## Usage
