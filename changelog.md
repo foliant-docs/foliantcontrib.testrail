@@ -1,5 +1,6 @@
-# 1.1.5 (under development)
+# 1.1.5
 
+-   Bug with test case table numbering when deleting empty objects fixed.
 -   Readme updated.
 
 # 1.1.4

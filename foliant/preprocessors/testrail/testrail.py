@@ -377,7 +377,12 @@ class Preprocessor(BasePreprocessor):
                         for string in range(string_counter):
                             self._test_cases.pop(index)
                         if len(self._test_cases) > 0:
+                            renumber_strings = False
+                            if self._std_table[len(self._std_table)-remove_from_case_list].split('|')[1].strip():
+                                renumber_strings = True
                             self._std_table.pop(len(self._std_table)-remove_from_case_list)
+                            if renumber_strings:
+                                self._renumber_strings(remove_from_case_list-1)
                         remove_from_case_list -= 1
 
                         next_iteration = True
@@ -385,6 +390,16 @@ class Preprocessor(BasePreprocessor):
                     empty_chapter_title_level = title_level
                     empty_chapter = True
                     string_counter = 0
+
+
+    def _renumber_strings(self, shift):
+        for string_number in range(len(self._std_table)-shift, len(self._std_table)):
+            case_number = self._std_table[string_number].split('|')[1].strip()
+            if case_number:
+                new_number = str(int(case_number) - 1)
+                if len(new_number)<len(case_number):
+                    new_number += ' '
+                self._std_table[string_number] = self._std_table[string_number].replace(case_number, new_number, 1)
 
 
     def _make_std_table_first_row(self, add_column_headers):
