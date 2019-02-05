@@ -70,7 +70,7 @@ preprocessors:
 :   If you have several suites in your project, you can download test cases from certain suites. You can find suite ID in the URL again, for example http://testrails.url/index.php?/suites/view/63... <-.
 
 `section_ids`
-:   Also you can download any sections you want regardless of it's level. Just keep in mind that this setting overrides previous *suite_ids* (but if you set *suite_ids* and then *ssection_ids* from another suite, nothing will be downloaded). And suddenly you can find section ID in it's URL, for example http://testrails.url/index.php?/suites/view/124&group_by=cases:section_id&group_order=asc&group_id=3926 <-.
+:   Also you can download any sections you want regardless of it's level. Just keep in mind that this setting overrides previous *suite_ids* (but if you set *suite_ids* and then *section_ids* from another suite, nothing will be downloaded). And suddenly you can find section ID in it's URL, for example http://testrails.url/index.php?/suites/view/124&group_by=cases:section_id&group_order=asc&group_id=3926 <-.
 
 `exclude_suite_ids`
 :   You can exclude any suites (even stated in *suite_ids*) from the document.
