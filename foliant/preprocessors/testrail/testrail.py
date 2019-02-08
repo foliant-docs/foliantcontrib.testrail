@@ -333,13 +333,16 @@ class Preprocessor(BasePreprocessor):
                 case_template = '/'.join((str(self.project_path), self._template_folder, ''.join((str(case['template_id']), '.j2'))))
 
                 if not os.path.isfile(case_template):
-                    print(f"\n\nhere is no jinja template for test case template_id {case['template_id']} (case_id {case['id']}) in folder {self._template_folder}")
+                    print(f"\n\nThere is no jinja template for test case template_id {case['template_id']} (case_id {case['id']}) in folder {self._template_folder}")
+                    if self._print_case_structure:
+                        print('\nCase structure:')
+                        pprint(case)
                 else:
                     try:
                         template = self._env.get_template(case_template)
                         result = template.render(case=case, params=self._params).split('\r\n')
                     except Exception as exception:
-                        print(f"\nThere is problem with jinja template for test case template_id {case['template_id']} (case_id {case['id']}) in folder {self._template_folder}:\n{exception}")
+                        print(f"\nThere is a problem with jinja template for test case template_id {case['template_id']} (case_id {case['id']}) in folder {self._template_folder}:\n{exception}")
                         if self._print_case_structure:
                             print('\nCase structure:')
                             pprint(case)

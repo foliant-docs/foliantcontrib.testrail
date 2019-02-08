@@ -369,7 +369,7 @@ That's it.
 And the last one emergency tool. If you have no jinja template for any type of TestRail case, you'll see this message like this: *There is no jinja template for test case template_id 5 (case_id 1325) in folder case_templates*. So you have to write jinja template by yourself. To do this it's necessary to know case structure. This parameter shows it to you.
 
 `print_case_structure`
-:   Turn on (*true*) or off (*false*, by default) printing out of case structure with all data in it.
+:   Turn on (*true*) or off (*false*, by default) printing out of case structure with all data in it if any problem occurs.
 
 
 ## Usage

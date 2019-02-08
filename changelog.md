@@ -1,3 +1,7 @@
+# 1.1.6
+
+-   Case structure output fixed if any problem occurs.
+
 # 1.1.5
 
 -   Bug with test case table numbering when deleting empty objects fixed.
