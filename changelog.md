@@ -1,3 +1,7 @@
+# 1.1.7
+
+-   Sections exclusion fixed.
+
 # 1.1.6
 
 -   Case structure output fixed if any problem occurs.

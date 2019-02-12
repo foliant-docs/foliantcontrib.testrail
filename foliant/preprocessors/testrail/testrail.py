@@ -156,23 +156,25 @@ class Preprocessor(BasePreprocessor):
                             continue
         self._suite_ids -= self._exclude_suite_ids
 
-        if not self._section_ids:
-            for suite in project_suites:
-                if suite['id'] in self._suite_ids:
-                    suite_sections = self._client.send_get('get_sections/%s&suite_id=%s' % (self._project_id, suite['id']))
-                    for section in suite_sections:    
-                        self._section_ids.add(section['id'])
-        next_iteration = True  # collect all child subsections for sections specified
-        while next_iteration:
-            next_iteration = False
-            for suite in project_suites:
-                if suite['id'] in self._suite_ids:
-                    suite_sections = self._client.send_get('get_sections/%s&suite_id=%s' % (self._project_id, suite['id']))
+        if self._section_ids:
+            selected_sections = True
+        else:
+            selected_sections = False
+
+        for suite in project_suites:
+            if suite['id'] in self._suite_ids:
+                suite_sections = self._client.send_get('get_sections/%s&suite_id=%s' % (self._project_id, suite['id']))
+                next_iteration = True
+                while next_iteration:
+                    next_iteration = False
                     for section in suite_sections:
-                        if section['id'] not in self._section_ids and section['parent_id'] in self._section_ids:    
+                        common_condition = section['id'] not in self._section_ids and section['id'] not in self._exclude_section_ids
+                        if not selected_sections and common_condition and (section['parent_id'] in self._section_ids or not section['parent_id']):
                             self._section_ids.add(section['id'])
                             next_iteration = True
-        self._section_ids -= self._exclude_section_ids
+                        if selected_sections and common_condition and section['parent_id'] in self._section_ids:
+                            self._section_ids.add(section['id'])
+                            next_iteration = True
 
 
     def _collect_cases(self, project_suites):
