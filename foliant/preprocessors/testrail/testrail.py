@@ -217,11 +217,7 @@ class Preprocessor(BasePreprocessor):
                 for i in range(section['depth']):
                     title_level_up += '#'
 
-                section_name = re.sub("[0-9].*\.", "", section['name']).strip()  # Remove numbers in section headers
-
-                if section_name.isupper():  # Remove headers capitalization
-                    section_name = section_name.lower()
-                    section_name = section_name[0].upper() + section_name[1:]
+                section_name = section['name'].strip()
 
                 self._test_cases.append('##%s %s\n\n' % (title_level_up,
                                 section_name))

@@ -1,3 +1,7 @@
+# 1.1.8
+
+-   Hardcoded section headers processing removed.
+
 # 1.1.7
 
 -   Sections exclusion fixed.
