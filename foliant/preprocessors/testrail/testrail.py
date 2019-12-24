@@ -285,6 +285,10 @@ class Preprocessor(BasePreprocessor):
         return take_case
 
 
+    def _get_case_data(self, case_id):
+        return self._client.send_get('get_case/%s&case_id' % (case_id))
+
+
     def _collect_case_data(self, suite_id, section_id, title_level_up):
         section_cases = self._client.send_get(
             'get_cases/%s&suite_id=%s&section_id=%s' %

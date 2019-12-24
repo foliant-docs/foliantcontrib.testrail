@@ -1,3 +1,7 @@
+# 1.1.9
+
+-   Function to get case data by id added.
+
 # 1.1.8
 
 -   Hardcoded section headers processing removed.
