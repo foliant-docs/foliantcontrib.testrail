@@ -352,7 +352,7 @@ class Preprocessor(BasePreprocessor):
 
                     if result:
                         for string in result:
-                            self._test_cases.append(string.strip())
+                            self._test_cases.append(string.rstrip())
                             self._test_cases.append('\n')
 
 

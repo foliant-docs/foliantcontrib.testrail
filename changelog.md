@@ -1,3 +1,7 @@
+# 1.1.11
+
+-   Misprint fixed.
+
 # 1.1.10
 
 -   Bug with template handling fixed.
