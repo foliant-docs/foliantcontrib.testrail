@@ -342,7 +342,7 @@ class Preprocessor(BasePreprocessor):
                 else:
                     try:
                         template = self._env.get_template(case_template)
-                        result = template.render(case=case, params=self._params).split('\r\n')
+                        result = template.render(case=case, params=self._params).split('\n')
                     except Exception as exception:
                         print(f"\nThere is a problem with jinja template for test case template_id {case['template_id']} (case_id {case['id']}) in folder {self._template_folder}:\n{exception}")
                         if self._print_case_structure:
@@ -352,7 +352,7 @@ class Preprocessor(BasePreprocessor):
 
                     if result:
                         for string in result:
-                            self._test_cases.append(string)
+                            self._test_cases.append(string.strip())
                             self._test_cases.append('\n')
 
 

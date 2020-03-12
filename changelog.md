@@ -1,3 +1,7 @@
+# 1.1.10
+
+-   Bug with template handling fixed.
+
 # 1.1.9
 
 -   Function to get case data by id added.
