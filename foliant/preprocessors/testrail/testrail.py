@@ -12,6 +12,7 @@ from pkg_resources import resource_filename
 import os
 from pathlib import Path
 from pprint import pprint
+import requests
 from shutil import copytree, copyfile
 import re
 
@@ -19,8 +20,9 @@ import re
 class Preprocessor(BasePreprocessor):
     defaults = {
         'filename': 'test_cases.md',
-        'rewrite_src_file': False,
+        'rewrite_src_files': False,
         'template_folder': 'case_templates',
+        'img_folder': 'testrail_imgs',
         'section_header': 'Программа испытаний',
         'std_table_header': 'Таблица прохождения испытаний',
         'std_table_column_headers': '№; Приоритет; Платформа; ID; Название; Успешно; Комментарий',
@@ -36,7 +38,7 @@ class Preprocessor(BasePreprocessor):
         'add_std_table': True,
         'resolve_urls': False,
         'screenshots_url': '',
-        'screenshots_ext': '.png',
+        'img_ext': '.png',
         'print_case_structure': False,
         'multi_param_name': '',
         'multi_param_select': '',
@@ -60,8 +62,9 @@ class Preprocessor(BasePreprocessor):
         self.logger.debug(f'Preprocessor inited: {self.__dict__}')
 
         self._filename = self.options['filename']
-        self._rewrite_src_file = self.options['rewrite_src_file']
+        self._rewrite_src_files = self.options['rewrite_src_files']
         self._template_folder = self.options['template_folder']
+        self._img_folder = self.options['img_folder']
         self._section_header = self.options['section_header']
 
         self._std_table_header = self.options['std_table_header']
@@ -70,6 +73,8 @@ class Preprocessor(BasePreprocessor):
         self._testrail_url = self.options['testrail_url']
         self._testrail_login = self.options['testrail_login']
         self._testrail_pass = self.options['testrail_pass']
+        self._login_url = '/'.join((self._testrail_url, 'index.php?/auth/login/'))
+        self._img_url = '/'.join((self._testrail_url, 'index.php?/attachments/get/'))
 
         self._client = testrailapi.APIClient(self._testrail_url)
         self._client.user = self._testrail_login
@@ -117,7 +122,7 @@ class Preprocessor(BasePreprocessor):
             self._screenshots_url = '/'.join((self.options['screenshots_url'], 'raw/master/images', self._params['multi_param_select'][0], ''))
         else:
             self._screenshots_url = '/'.join((self.options['screenshots_url'], 'raw/master/images/'))
-        self._screenshots_ext = self.options['screenshots_ext']
+        self._img_ext = self.options['img_ext']
 
         self._print_case_structure = self.options['print_case_structure']
 
@@ -289,6 +294,41 @@ class Preprocessor(BasePreprocessor):
         return self._client.send_get('get_case/%s&case_id' % (case_id))
 
 
+    def _download_images(self, case):
+
+        image_string = '\!\[.*\]\(index\.php\?\/attachments\/get\/.*\)'
+        login_data = {
+            'name': self._testrail_login,
+            'password': self._testrail_pass,
+            'submit': 'Log in'
+        }
+
+        for case_item in case:
+            if type(case[case_item]) is list:
+                for item in case[case_item]:
+                    self._download_images(item)
+            else:
+                if re.search(image_string, str(case[case_item])):
+
+                    session = requests.session()
+                    auth = session.post(self._login_url, data=login_data)
+
+                    img_id = case[case_item].split('get/')[1].split(')')[0]
+                    img_path = Path('.', self.working_dir, self._img_folder)
+                    img_path.mkdir(exist_ok=True, parents=True)
+                    img_rel_path = str(Path(self._img_folder, img_id)) + self._img_ext
+                    img_name = str(Path(img_path, img_id)) + self._img_ext
+
+                    with open(img_name, 'wb') as image:
+                        response = session.get(self._img_url + img_id, stream=True)
+                        for block in response.iter_content(1024):
+                            image.write(block)
+
+                    case[case_item] = re.sub('(\!\[.*\]\()(index\.php\?\/attachments\/get\/.*)(\).*)', '\g<1>' + img_rel_path + '\g<3>', case[case_item])
+
+                    session.close()
+
+
     def _collect_case_data(self, suite_id, section_id, title_level_up):
         section_cases = self._client.send_get(
             'get_cases/%s&suite_id=%s&section_id=%s' %
@@ -331,8 +371,10 @@ class Preprocessor(BasePreprocessor):
                 self._std_table.append(table_row)
                 self._test_cases.append('##%s %s%s\n\n' % (title_level_up, case['title'], header_ending))
 
+                self._download_images(case)
+
 # Test-case processing differs depending on the template id. All processors are in case_processing module.
-                case_template = '/'.join((str(self.project_path), self._template_folder, ''.join((str(case['template_id']), '.j2'))))
+                case_template = str(Path(self.project_path, self._template_folder, str(case['template_id']))) + '.j2'
 
                 if not os.path.isfile(case_template):
                     print(f"\n\nThere is no jinja template for test case template_id {case['template_id']} (case_id {case['id']}) in folder {self._template_folder}")
@@ -462,9 +504,9 @@ class Preprocessor(BasePreprocessor):
         for i, string in enumerate(self._test_cases):
             if '![' in string:
                 if self._params['multi_param_select'][0] != '':
-                    self._test_cases[i] = re.sub("(?<=[\]][\(])(\w*)", self._screenshots_url + "\g<1>" + '_' + self._params['multi_param_select'][0] + self._screenshots_ext, string)
+                    self._test_cases[i] = re.sub("(?<=[\]][\(])(\w*)", self._screenshots_url + "\g<1>" + '_' + self._params['multi_param_select'][0] + self._img_ext, string)
                 else:
-                    self._test_cases[i] = re.sub("(?<=[\]][\(])(\w*)", self._screenshots_url + "\g<1>" + self._screenshots_ext, string)
+                    self._test_cases[i] = re.sub("(?<=[\]][\(])(\w*)", self._screenshots_url + "\g<1>" + self._img_ext, string)
 
 
     def _get_multi_param_matches(self):
@@ -527,7 +569,7 @@ class Preprocessor(BasePreprocessor):
                 self._test_cases.append('\n' + line)
             self._test_cases.append('\n')
 
-        markdown_file_path = '/'.join((str(self.working_dir), self._filename))
+        markdown_file_path = Path(self.working_dir, self._filename)
 
         self.logger.debug(f'Processing Markdown file: {markdown_file_path}')
 
@@ -535,8 +577,16 @@ class Preprocessor(BasePreprocessor):
             for string in self._test_cases:
                 file_to_write.write(string)
 
-        src_file_path = '/'.join((str(self.config['src_dir']), self._filename))
-        if self._rewrite_src_file:
+        if self._rewrite_src_files:
+            src_file_path = Path(self.config['src_dir'], self._filename)
             copyfile(markdown_file_path, src_file_path)
+
+            img_path = Path(self.working_dir, self._img_folder)
+            copy_path = Path(self.config['src_dir'], self._img_folder)
+            copy_path.mkdir(exist_ok=True, parents=True)
+            for item in os.listdir(img_path):
+                src = os.path.join(img_path, item)
+                dst = os.path.join(copy_path, item)
+                copyfile(src, dst)
 
         self.logger.info('Preprocessor applied')

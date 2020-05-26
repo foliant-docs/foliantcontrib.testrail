@@ -27,8 +27,9 @@ preprocessors:
     exclude_section_ids:                                                                    \\ Optional
     exclude_case_ids:                                                                       \\ Optional
     filename: test_cases.md                                                                 \\ Optional
-    rewrite_src_file: false                                                                 \\ Optional
+    rewrite_src_files: false                                                                \\ Optional
     template_folder: case_templates                                                         \\ Optional
+    img_folder: testrail_imgs                                                               \\ Optional
     section_header: Testing program                                                         \\ Recommended
     add_std_table: true                                                                     \\ Optional
     std_table_header: Table with testing results                                            \\ Recommended
@@ -50,7 +51,7 @@ preprocessors:
     add_priority_to_std_table: false                                                        \\ Optional
     resolve_urls: true                                                                      \\ Optional
     screenshots_url: https://gitlab_repository.url                                          \\ Optional
-    screenshots_ext: .png                                                                   \\ Optional
+    img_ext: .png                                                                           \\ Optional
     print_case_structure: true                                                              \\ For debugging
 ```
 
@@ -102,7 +103,7 @@ preprocessors:
     filename: awesome_test_cases.md
 ```
 
-`rewrite_src_file`
+`rewrite_src_files`
 :   You can update (*true*) test cases file after each use of preprocessor. Be careful, previous data will be deleted.
 
 `template_folder`
@@ -201,6 +202,9 @@ params = {
 ```
 
 Next three fields are necessary due localization issues. While markdown document with test cases is composed on the go, you have to set up some document headers. Definitely not the best solution in my life. 
+
+`img_folder`
+:   Folder to store downloaded images if `rewrite_src_files=True`.
 
 `section_header`
 :   First level header of section with test cases. By default it's *Testing program* in Russian.
@@ -304,7 +308,7 @@ Using described setting you can flexibly adjust test cases sampling. For example
 
 Now strange things, mostly made specially for my project, but may be useful for others.
 
-Screenshots. There is no possibility to store screenshots in TestRail projects, but you can store them in the GitLab repository (link to which should be stated in one of the following parameters). GitLab project should have following structure:
+Screenshots. There is a possibility to store screenshots in TestRail test cases, but you can store them in the GitLab repository (link to which should be stated in one of the following parameters). GitLab project should have following structure:
 
 ```
 images/
@@ -363,8 +367,8 @@ That's it.
 `screenshots_url`
 :   GitLab repository URL, in our example: https://gitlab.url/documentation/application-screenshots/ .
 
-`screenshots_ext`
-:   Screenshots extension. Yes, it must be only one and the same for all screenshots.
+`img_ext`
+:   Screenshots extension. Yes, it must be only one and the same for all screenshots. Also this parameter used to save downloaded images from TestRail.
 
 And the last one emergency tool. If you have no jinja template for any type of TestRail case, you'll see this message like this: *There is no jinja template for test case template_id 5 (case_id 1325) in folder case_templates*. So you have to write jinja template by yourself. To do this it's necessary to know case structure. This parameter shows it to you.
 

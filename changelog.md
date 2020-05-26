@@ -1,3 +1,13 @@
+# 1.2.0
+
+-   Downloading of images from test cases implemented.
+-   New parameter:
+    - img_folder – folder name to store downloaded images.
+-   Renamed parameters:
+    - rewrite_src_file -> rewrite_src_files,
+    - screenshots_ext -> img_ext.
+-   Paths processing fixed.
+
 # 1.1.11
 
 -   Misprint fixed.
