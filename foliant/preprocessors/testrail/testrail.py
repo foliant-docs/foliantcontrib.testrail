@@ -582,11 +582,12 @@ class Preprocessor(BasePreprocessor):
             copyfile(markdown_file_path, src_file_path)
 
             img_path = Path(self.working_dir, self._img_folder)
-            copy_path = Path(self.config['src_dir'], self._img_folder)
-            copy_path.mkdir(exist_ok=True, parents=True)
-            for item in os.listdir(img_path):
-                src = os.path.join(img_path, item)
-                dst = os.path.join(copy_path, item)
-                copyfile(src, dst)
+            if os.path.isdir(img_path):
+                copy_path = Path(self.config['src_dir'], self._img_folder)
+                copy_path.mkdir(exist_ok=True, parents=True)
+                for item in os.listdir(img_path):
+                    src = os.path.join(img_path, item)
+                    dst = os.path.join(copy_path, item)
+                    copyfile(src, dst)
 
         self.logger.info('Preprocessor applied')

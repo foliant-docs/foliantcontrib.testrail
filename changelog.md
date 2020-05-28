@@ -1,3 +1,7 @@
+# 1.2.1
+
+-   Bug with copying nonexistent folder to source fixed.
+
 # 1.2.0
 
 -   Downloading of images from test cases implemented.
