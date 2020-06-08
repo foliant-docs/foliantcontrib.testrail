@@ -1,3 +1,7 @@
+# 1.2.2
+
+-   Processing of several images in one case-step fixed.
+
 # 1.2.1
 
 -   Bug with copying nonexistent folder to source fixed.

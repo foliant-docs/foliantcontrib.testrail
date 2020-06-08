@@ -310,23 +310,25 @@ class Preprocessor(BasePreprocessor):
             else:
                 if re.search(image_string, str(case[case_item])):
 
-                    session = requests.session()
-                    auth = session.post(self._login_url, data=login_data)
+                    for item in re.findall(image_string, str(case[case_item])):
+                    
+                        session = requests.session()
+                        auth = session.post(self._login_url, data=login_data)
 
-                    img_id = case[case_item].split('get/')[1].split(')')[0]
-                    img_path = Path('.', self.working_dir, self._img_folder)
-                    img_path.mkdir(exist_ok=True, parents=True)
-                    img_rel_path = str(Path(self._img_folder, img_id)) + self._img_ext
-                    img_name = str(Path(img_path, img_id)) + self._img_ext
+                        img_id = item.split('get/')[1].split(')')[0]
+                        img_path = Path('.', self.working_dir, self._img_folder)
+                        img_path.mkdir(exist_ok=True, parents=True)
+                        img_rel_path = str(Path(self._img_folder, img_id)) + self._img_ext
+                        img_name = str(Path(img_path, img_id)) + self._img_ext
 
-                    with open(img_name, 'wb') as image:
-                        response = session.get(self._img_url + img_id, stream=True)
-                        for block in response.iter_content(1024):
-                            image.write(block)
+                        with open(img_name, 'wb') as image:
+                            response = session.get(self._img_url + img_id, stream=True)
+                            for block in response.iter_content(1024):
+                                image.write(block)
 
-                    case[case_item] = re.sub('(\!\[.*\]\()(index\.php\?\/attachments\/get\/.*)(\).*)', '\g<1>' + img_rel_path + '\g<3>', case[case_item])
+                        case[case_item] = re.sub(f'(\!\[.*\]\()(index\.php\?\/attachments\/get\/{img_id})(\).*)', '\g<1>' + img_rel_path + '\g<3>', case[case_item])
 
-                    session.close()
+                        session.close()
 
 
     def _collect_case_data(self, suite_id, section_id, title_level_up):
