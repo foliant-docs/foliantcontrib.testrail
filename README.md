@@ -30,10 +30,11 @@ preprocessors:
     rewrite_src_files: false                                                                \\ Optional
     template_folder: case_templates                                                         \\ Optional
     img_folder: testrail_imgs                                                               \\ Optional
+    move_imgs_from_text: false                                                              \\ Optional
     section_header: Testing program                                                         \\ Recommended
-    add_std_table: true                                                                     \\ Optional
     std_table_header: Table with testing results                                            \\ Recommended
     std_table_column_headers: №; Priority; Platform; ID; Test case name; Result; Comment    \\ Recommended
+    add_std_table: true                                                                     \\ Optional
     add_suite_headers: true                                                                 \\ Optional
     add_section_headers: true                                                               \\ Optional
     add_case_id_to_case_header: false                                                       \\ Optional
@@ -197,26 +198,146 @@ params = {
     'add_priority_to_case_header': True,
     'add_priority_to_std_table': True,
     'add_case_id_to_case_header': False,
-    'add_case_id_to_std_table': False
+    'add_case_id_to_std_table': False,
+    'links_to_images': [
+        {'id': '123', 'link': '![Image caption](testrail_imgs/123.png)'},
+        ...
+    ]
 }
 ```
-
-Next three fields are necessary due localization issues. While markdown document with test cases is composed on the go, you have to set up some document headers. Definitely not the best solution in my life. 
 
 `img_folder`
 :   Folder to store downloaded images if `rewrite_src_files=True`.
 
+`move_imgs_from_text`
+:   It's impossible to compile test cases with images to the table. So you can use this parameter to convert image links in test cases to ordinary markdown-links and get the list with all image links in params['links_to_images'] parameter to use in jinja template. In this case you'll have to use [multilinetables](https://foliant-docs.github.io/docs/preprocessors/multilinetables/) and [anchors](https://foliant-docs.github.io/docs/preprocessors/anchors/) preprocessors.
+
+For example, you have 2-step test case:
+
+```
+Step 1:
+
+Press the button:
+
+![Button](index.php?/attachments/get/741)
+
+Result 1:
+
+Dialog box will opened:
+
+![Dialog box](index.php?/attachments/get/741)
+
+Step 2:
+
+Select option:
+
+![List of options](index.php?/attachments/get/742)
+
+Result 2:
+
+Option selected:
+
+![Result](index.php?/attachments/get/743)
+```
+
+Minimal *multilinetables* and *anchors* preprocessor settings in `foliant.yml` should be like this (more about *multilinetables* parameters see in [preprocessor documentation](https://foliant-docs.github.io/docs/preprocessors/multilinetables/)):
+
+```
+    - anchors
+    - multilinetables:
+        enable_hyphenation: true
+        hyph_combination: brkln
+        convert_to_grid: true
+```
+
+After *testrail* preprocessor process this test case, you will have `params['links_to_images']` parameter with list of image links in order of appearance to use in jinja template:
+
+```yaml
+[
+    {'id': '740', 'link': '![Button](testrail_imgs/740.png)'},
+    {'id': '741', 'link': '![Dialog box](testrail_imgs/741.png)'},
+    {'id': '742', 'link': '![List of options](testrail_imgs/742.png)'},
+    {'id': '743', 'link': '![Result](testrail_imgs/743.png)'}
+]
+```
+
+Using this jinja template:
+
+```
+**Testing procedure:**
+
+| # | Test step         | Expected result     | Passed   | Comment                |
+|---|-------------------|---------------------|----------|------------------------|
+{% for case_step in case['custom_steps_separated'] -%}
+| {{ loop.index }} | {{ case_step['content']|replace("\n", "brkln") }} | {{ case_step['expected']|replace("\n", "brkln") }} |  |  |
+{% endfor %}
+
+{% if params['links_to_images'] %}
+*Images:*
+
+{% for image in params['links_to_images'] %}
+<anchor>{{ image['id'] }}</anchor>
+
+{{ image['link'] }}
+
+{% endfor %}
+{% endif %}
+```
+
+The markdown result will be:
+
+```
+**Testing procedure:**
+
++---+-----------------------------------------+----------------------------------------+--------+---------+
+| # | Test step                               | Expected result                        | Passed | Comment |
++===+=========================================+========================================+========+=========+
+| 1 | Press the button                        | Dialog box will opened:                |        |         |
+|   |                                         |                                        |        |         |
+|   | [Button](#740)                          | [Dialog box](#741)                     |        |         |
+|   |                                         |                                        |        |         |
++---+-----------------------------------------+----------------------------------------+--------+---------+
+| 2 | Select option:                          | Option selected:                       |        |         |
+|   |                                         |                                        |        |         |
+|   | [List of options](#742)                 | [Result](#743)                         |        |         |
++---+-----------------------------------------+----------------------------------------+--------+---------+
+
+*Images:*
+
+<anchor>740</anchor>
+
+![Button](testrail_imgs/740.png)
+
+<anchor>741</anchor>
+
+![Dialog box](testrail_imgs/741.png)
+
+<anchor>742</anchor>
+
+![List of options](testrail_imgs/742.png)
+
+<anchor>743</anchor>
+
+![Result](testrail_imgs/743.png)
+```
+
+So you can use links in the table to go to correspondent image.
+
+> **Important!** Anchors must differ, so you can't use one image in various test cases. If necessary make a copy of image.
+
+Next three fields are necessary due localization issues. While markdown document with test cases is composed on the go, you have to set up some document headers. Definitely not the best solution in my life. 
+
 `section_header`
 :   First level header of section with test cases. By default it's *Testing program* in Russian.
-
-`add_std_table`
-:   You can exclude (*false*) a testing table from the document.
 
 `std_table_header`
 :   First level header of section with test results table. By default it's *Testing table* in Russian.
 
 `std_table_column_headers`
 :   Semicolon separated headers of testing table columns. By default it's *№; Priority; Platform; ID; Test case name; Result; Comment* in Russian.
+
+`add_std_table`
+:   You can exclude (*false*) a testing table from the document.
 
 `add_suite_headers`
 :   With *false* you can exclude all suite headers from the final document.

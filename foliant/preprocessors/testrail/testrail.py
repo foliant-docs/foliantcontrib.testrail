@@ -23,6 +23,7 @@ class Preprocessor(BasePreprocessor):
         'rewrite_src_files': False,
         'template_folder': 'case_templates',
         'img_folder': 'testrail_imgs',
+        'move_imgs_from_text': False,
         'section_header': 'Программа испытаний',
         'std_table_header': 'Таблица прохождения испытаний',
         'std_table_column_headers': '№; Приоритет; Платформа; ID; Название; Успешно; Комментарий',
@@ -65,6 +66,7 @@ class Preprocessor(BasePreprocessor):
         self._rewrite_src_files = self.options['rewrite_src_files']
         self._template_folder = self.options['template_folder']
         self._img_folder = self.options['img_folder']
+        self._move_imgs_from_text = self.options['move_imgs_from_text']
         self._section_header = self.options['section_header']
 
         self._std_table_header = self.options['std_table_header']
@@ -110,7 +112,8 @@ class Preprocessor(BasePreprocessor):
             'add_priority_to_case_header': self.options['add_priority_to_case_header'],
             'add_priority_to_std_table': self.options['add_priority_to_std_table'],
             'add_case_id_to_case_header': self.options['add_case_id_to_case_header'],
-            'add_case_id_to_std_table': self.options['add_case_id_to_std_table']
+            'add_case_id_to_std_table': self.options['add_case_id_to_std_table'],
+            'links_to_images': []
         }
 
         self._add_suite_headers = self.options['add_suite_headers']
@@ -320,13 +323,19 @@ class Preprocessor(BasePreprocessor):
                         img_path.mkdir(exist_ok=True, parents=True)
                         img_rel_path = str(Path(self._img_folder, img_id)) + self._img_ext
                         img_name = str(Path(img_path, img_id)) + self._img_ext
+                        img_link = re.sub(f'(\!\[.*\]\()(index\.php\?\/attachments\/get\/{img_id})(\).*)', '\g<1>' + img_rel_path + '\g<3>', item)
 
                         with open(img_name, 'wb') as image:
                             response = session.get(self._img_url + img_id, stream=True)
                             for block in response.iter_content(1024):
                                 image.write(block)
 
-                        case[case_item] = re.sub(f'(\!\[.*\]\()(index\.php\?\/attachments\/get\/{img_id})(\).*)', '\g<1>' + img_rel_path + '\g<3>', case[case_item])
+                        if not self._move_imgs_from_text:
+                            case[case_item] = re.sub(f'\!\[.*\]\(index\.php\?\/attachments\/get\/{img_id}\)', img_link, case[case_item])
+                        else:
+                            self._params['links_to_images'].append({'id': img_id, 'link': img_link})
+                            case[case_item] = re.sub('!\[', '[', case[case_item])
+                            case[case_item] = re.sub('index\.php\?\/attachments\/get\/', '#', case[case_item])
 
                         session.close()
 
@@ -373,6 +382,7 @@ class Preprocessor(BasePreprocessor):
                 self._std_table.append(table_row)
                 self._test_cases.append('##%s %s%s\n\n' % (title_level_up, case['title'], header_ending))
 
+                self._params['links_to_images'] = []
                 self._download_images(case)
 
 # Test-case processing differs depending on the template id. All processors are in case_processing module.

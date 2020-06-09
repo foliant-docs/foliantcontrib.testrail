@@ -1,3 +1,9 @@
+# 1.3.0
+
+-   New parameter:
+    - move_imgs_from_text — converts image links in test cases to ordinary markdown-links, and adds all links to *params* variable to use in jinja template.
+-   Some readme.md bugs fixed.
+
 # 1.2.2
 
 -   Processing of several images in one case-step fixed.
