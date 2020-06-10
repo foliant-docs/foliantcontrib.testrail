@@ -321,9 +321,9 @@ The markdown result will be:
 ![Result](testrail_imgs/743.png)
 ```
 
-So you can use links in the table to go to correspondent image.
+So you can use links in the table to go to the correspondent image.
 
-> **Important!** Anchors must differ, so you can't use one image in various test cases. If necessary make a copy of image.
+> **Important!** Anchors must differ, so if one image (with the same image id) will appear in several test cases, this image will be downloaded separately for each appearance and renamed with postfix '-1', '-2', etc.
 
 Next three fields are necessary due localization issues. While markdown document with test cases is composed on the go, you have to set up some document headers. Definitely not the best solution in my life. 
 

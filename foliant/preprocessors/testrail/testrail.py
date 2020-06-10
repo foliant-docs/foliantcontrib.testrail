@@ -67,8 +67,9 @@ class Preprocessor(BasePreprocessor):
         self._template_folder = self.options['template_folder']
         self._img_folder = self.options['img_folder']
         self._move_imgs_from_text = self.options['move_imgs_from_text']
-        self._section_header = self.options['section_header']
+        self._unique_img_names = set()
 
+        self._section_header = self.options['section_header']
         self._std_table_header = self.options['std_table_header']
         self._std_table_column_headers = list(map(str.strip, list(self.options['std_table_column_headers'].split(';'))))
 
@@ -318,24 +319,30 @@ class Preprocessor(BasePreprocessor):
                         session = requests.session()
                         auth = session.post(self._login_url, data=login_data)
 
-                        img_id = item.split('get/')[1].split(')')[0]
+                        img_orig_id = item.split('get/')[1].split(')')[0]
+                        img_new_id = img_orig_id
+                        postfix = 1
+                        while img_new_id in self._unique_img_names:
+                            img_new_id = img_orig_id + '-' + str(postfix)
+                            postfix += 1
+                        self._unique_img_names.add(img_new_id)
                         img_path = Path('.', self.working_dir, self._img_folder)
                         img_path.mkdir(exist_ok=True, parents=True)
-                        img_rel_path = str(Path(self._img_folder, img_id)) + self._img_ext
-                        img_name = str(Path(img_path, img_id)) + self._img_ext
-                        img_link = re.sub(f'(\!\[.*\]\()(index\.php\?\/attachments\/get\/{img_id})(\).*)', '\g<1>' + img_rel_path + '\g<3>', item)
+                        img_rel_path = str(Path(self._img_folder, img_new_id)) + self._img_ext
+                        img_name = str(Path(img_path, img_new_id)) + self._img_ext
+                        img_link = re.sub(f'(\!\[.*\]\()(index\.php\?\/attachments\/get\/{img_orig_id})(\).*)', '\g<1>' + img_rel_path + '\g<3>', item)
 
                         with open(img_name, 'wb') as image:
-                            response = session.get(self._img_url + img_id, stream=True)
+                            response = session.get(self._img_url + img_orig_id, stream=True)
                             for block in response.iter_content(1024):
                                 image.write(block)
 
                         if not self._move_imgs_from_text:
-                            case[case_item] = re.sub(f'\!\[.*\]\(index\.php\?\/attachments\/get\/{img_id}\)', img_link, case[case_item])
+                            case[case_item] = re.sub(f'\!\[.*\]\(index\.php\?\/attachments\/get\/{img_orig_id}\)', img_link, case[case_item])
                         else:
-                            self._params['links_to_images'].append({'id': img_id, 'link': img_link})
+                            self._params['links_to_images'].append({'id': img_new_id, 'link': img_link})
                             case[case_item] = re.sub('!\[', '[', case[case_item])
-                            case[case_item] = re.sub('index\.php\?\/attachments\/get\/', '#', case[case_item])
+                            case[case_item] = re.sub(f'index\.php\?\/attachments\/get\/{img_orig_id}', '#' + img_new_id, case[case_item])
 
                         session.close()
 

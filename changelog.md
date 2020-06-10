@@ -1,3 +1,7 @@
+# 1.3.1
+
+-   Now it's possible to use one image in several test-cases and process it correctly with *move_imgs_from_text* parameter.
+
 # 1.3.0
 
 -   New parameter:
