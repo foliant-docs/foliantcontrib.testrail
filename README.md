@@ -219,7 +219,7 @@ Step 1:
 
 Press the button:
 
-![Button](index.php?/attachments/get/741)
+![Button](index.php?/attachments/get/740)
 
 Result 1:
 
