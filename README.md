@@ -200,7 +200,7 @@ params = {
     'add_case_id_to_case_header': False,
     'add_case_id_to_std_table': False,
     'links_to_images': [
-        {'id': '123', 'link': '![Image caption](testrail_imgs/123.png)'},
+        {'id': '123', 'link': '(leading_exclamation_mark_here)[Image caption](testrail_imgs/123.png)'},
         ...
     ]
 }
@@ -219,25 +219,25 @@ Step 1:
 
 Press the button:
 
-![Button](index.php?/attachments/get/740)
+(leading_exclamation_mark_here)[Button](index.php?/attachments/get/740)
 
 Result 1:
 
 Dialog box will opened:
 
-![Dialog box](index.php?/attachments/get/741)
+(leading_exclamation_mark_here)[Dialog box](index.php?/attachments/get/741)
 
 Step 2:
 
 Select option:
 
-![List of options](index.php?/attachments/get/742)
+(leading_exclamation_mark_here)[List of options](index.php?/attachments/get/742)
 
 Result 2:
 
 Option selected:
 
-![Result](index.php?/attachments/get/743)
+(leading_exclamation_mark_here)[Result](index.php?/attachments/get/743)
 ```
 
 Minimal *multilinetables* and *anchors* preprocessor settings in `foliant.yml` should be like this (more about *multilinetables* parameters see in [preprocessor documentation](https://foliant-docs.github.io/docs/preprocessors/multilinetables/)):
@@ -254,10 +254,10 @@ After *testrail* preprocessor process this test case, you will have `params['lin
 
 ```yaml
 [
-    {'id': '740', 'link': '![Button](testrail_imgs/740.png)'},
-    {'id': '741', 'link': '![Dialog box](testrail_imgs/741.png)'},
-    {'id': '742', 'link': '![List of options](testrail_imgs/742.png)'},
-    {'id': '743', 'link': '![Result](testrail_imgs/743.png)'}
+    {'id': '740', 'link': '(leading_exclamation_mark_here)[Button](testrail_imgs/740.png)'},
+    {'id': '741', 'link': '(leading_exclamation_mark_here)[Dialog box](testrail_imgs/741.png)'},
+    {'id': '742', 'link': '(leading_exclamation_mark_here)[List of options](testrail_imgs/742.png)'},
+    {'id': '743', 'link': '(leading_exclamation_mark_here)[Result](testrail_imgs/743.png)'}
 ]
 ```
 
@@ -306,19 +306,19 @@ The markdown result will be:
 
 <anchor>740</anchor>
 
-![Button](testrail_imgs/740.png)
+(leading_exclamation_mark_here)[Button](testrail_imgs/740.png)
 
 <anchor>741</anchor>
 
-![Dialog box](testrail_imgs/741.png)
+(leading_exclamation_mark_here)[Dialog box](testrail_imgs/741.png)
 
 <anchor>742</anchor>
 
-![List of options](testrail_imgs/742.png)
+(leading_exclamation_mark_here)[List of options](testrail_imgs/742.png)
 
 <anchor>743</anchor>
 
-![Result](testrail_imgs/743.png)
+(leading_exclamation_mark_here)[Result](testrail_imgs/743.png)
 ```
 
 So you can use links in the table to go to the correspondent image.
