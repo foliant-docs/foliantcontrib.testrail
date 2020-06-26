@@ -2,6 +2,7 @@
 
 TestRail preprocessor collects test cases from TestRail project and adds to your testing procedure document.
 
+> Important notice! We have some problems with displaying an exclamation mark in the image links, so they are replaced with `(leading_exclamation_mark_here)` phrase in the text.
 
 ## Installation
 
