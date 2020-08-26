@@ -20,7 +20,7 @@ preprocessors:
   - testrail:
     testrail_url: http://testrails.url                                                      \\ Required
     testrail_login: username                                                                \\ Required
-    testrail_pass: password                                                                 \\ Required
+    testrail_pass: !env TESTRAIL_PASS                                                                 \\ Required
     project_id: 35                                                                          \\ Required
     suite_ids:                                                                              \\ Optional
     section_ids:                                                                            \\ Optional
@@ -66,6 +66,8 @@ preprocessors:
 `testrail_pass`
 :   Your TestRail password.
 
+> It is not secure to store plain text passwords in your config files. We recommend to use [environment variables](https://foliant-docs.github.io/docs/config/#env) to supply passwords.
+
 `project_id`
 :   TestRail project ID. You can find it in the project URL, for example http://testrails.url/index.php?/projects/overview/17 <-.
 
@@ -79,7 +81,7 @@ preprocessors:
 :   You can exclude any suites (even stated in *suite_ids*) from the document.
 
 `exclude_section_ids`
-:   The same with the sections. 
+:   The same with the sections.
 
 `exclude_case_ids`
 :   And the same with the cases.
@@ -326,7 +328,7 @@ So you can use links in the table to go to the correspondent image.
 
 > **Important!** Anchors must differ, so if one image (with the same image id) will appear in several test cases, this image will be downloaded separately for each appearance and renamed with postfix '-1', '-2', etc.
 
-Next three fields are necessary due localization issues. While markdown document with test cases is composed on the go, you have to set up some document headers. Definitely not the best solution in my life. 
+Next three fields are necessary due localization issues. While markdown document with test cases is composed on the go, you have to set up some document headers. Definitely not the best solution in my life.
 
 `section_header`
 :   First level header of section with test cases. By default it's *Testing program* in Russian.
