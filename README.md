@@ -1,3 +1,5 @@
+[![](https://img.shields.io/pypi/v/foliantcontrib.testrail.svg)](https://pypi.org/project/foliantcontrib.testrail/) [![](https://img.shields.io/github/v/tag/foliant-docs/foliantcontrib.testrail.svg?label=GitHub)](https://github.com/foliant-docs/foliantcontrib.testrail)
+
 # TestRail cases downloader for Foliant
 
 TestRail preprocessor collects test cases from TestRail project and adds to your testing procedure document.
